@@ -18,3 +18,28 @@
  *    Ensure that you are not counting a customer that has rented a movie twice as 2 separate customers renting the movie.
  *    I did this by using the SELECT DISTINCT clause.
  */
+/*select all customer of 'BUCKET BROTHERHOOD', then find all the movies that they have rented and select 3 repeating ones. Ensure that no duplicate movies for a customer use except clause to remove rows with matching title and customer_id*/
+select title --, customer_id
+from (
+select distinct f1.title, c1.customer_id --, count(title) --, c1.customer_id
+from film f1
+join inventory i1 on f1.film_id = i1.film_id
+join rental r1 on i1.inventory_id = r1.inventory_id
+join customer c1 on r1.customer_id = c1.customer_id
+where c1.customer_id in (
+select c1.customer_id 
+from film f1
+join inventory i1 on f1.film_id = i1.film_id
+join rental r1 on i1.inventory_id = r1.inventory_id
+join customer c1 on r1.customer_id = c1.customer_id
+
+where f1.title = 'BUCKET BROTHERHOOD'
+)
+) as t
+group by title
+having count(title) >=3
+except
+select title
+from film
+where film.title = 'BUCKET BROTHERHOOD'
+order by title;
